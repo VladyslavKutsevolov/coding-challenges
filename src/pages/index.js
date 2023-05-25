@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Table from "@/components/Table/Table";
+import { Table } from "@/components/Table";
 import { generateFakeData } from "@/utils/helpers";
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 
@@ -25,6 +25,7 @@ export default function Home({ usersData }) {
         users={hasDynamicUsers ? dynamicUsers : users}
         isLoading={isLoading}
         loadMoreUsers={loadMoreUsers}
+        setUsers={setUsers}
       />
     </main>
   );

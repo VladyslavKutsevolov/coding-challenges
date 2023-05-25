@@ -1,39 +1,77 @@
 import React, { useEffect, useState } from "react";
-import Loader from "@/components/Loader";
-import TableHeader from "@/components/Table/TableHeader";
-import TableBody from "@/components/Table/TableBody";
+import Loader from "@/components/Loader/Loader";
+import { TableBody, TableHeader } from "@/components/Table";
 import { getFromLocalStorage, saveToLocalStorage } from "@/utils/helpers";
+import SaveTableOrderPopup from "@/components/Table/SaveTableOrderPopup";
 
 const tableHeaders = [
-  { name: "ID", sortable: true, fixedWidth: "w-1/6", draggable: false },
-  { name: "First Name", sortable: true, draggable: true },
-  { name: "Last Name", sortable: true, draggable: true },
-  { name: "Email", sortable: true, draggable: true },
-  { name: "City", sortable: true, draggable: true },
-  { name: "Registered Date", sortable: true, draggable: true },
-  { name: "Full Name", sortable: true, draggable: true },
-  { name: "Date since registered", sortable: true, draggable: true },
+  {
+    name: "ID",
+    sortable: true,
+    fixedWidth: "w-1/6",
+    draggable: false,
+    sortKey: "id",
+  },
+  { name: "First Name", sortable: true, draggable: true, sortKey: "firstName" },
+  { name: "Last Name", sortable: true, draggable: true, sortKey: "lastName" },
+  { name: "Email", sortable: true, draggable: true, sortKey: "email" },
+  { name: "City", sortable: true, draggable: true, sortKey: "city" },
+  {
+    name: "Registered Date",
+    sortable: true,
+    draggable: true,
+    sortKey: "registeredDate",
+  },
+  { name: "Full Name", sortable: true, draggable: true, sortKey: "fullName" },
+  {
+    name: "Date since registered",
+    sortable: true,
+    draggable: true,
+    sortKey: "dsr",
+  },
 ];
 
-const Table = ({ users, isLoading, loadMoreUsers }) => {
+const hasHeadersChanged = (actual, stored) =>
+  stored?.length && JSON.stringify(stored) !== JSON.stringify(actual);
+
+const compareValues = (value1, value2, dataType, direction) => {
+  let result = 0;
+
+  switch (dataType) {
+    case "number":
+      result = value1 - value2;
+      break;
+    case "string":
+      result = value1.localeCompare(value2);
+      break;
+    case "date":
+      result = new Date(value1) - new Date(value2);
+      break;
+    default:
+      result = 0;
+  }
+
+  return direction === "asc" ? result : -result;
+};
+
+const Table = ({ users, isLoading, loadMoreUsers, setUsers }) => {
   const [headers, setHeaders] = useState(tableHeaders);
   const [dragOver, setDragOver] = useState(null);
+  const [confirmPopup, setConfirmPopup] = useState(false);
+  const [sortColumn, setSortColumn] = useState(null);
+  const [sortDirection, setSortDirection] = useState("asc");
 
   useEffect(() => {
     const storedHeaders = getFromLocalStorage("headers");
 
-    const differFromStored =
-      storedHeaders.length &&
-      JSON.stringify(storedHeaders) !== JSON.stringify(headers);
+    const differFromDefaultHeaders = hasHeadersChanged(headers, storedHeaders);
 
-    console.log("differFromStored", differFromStored);
-
-    if (differFromStored) {
+    if (differFromDefaultHeaders) {
       setHeaders(storedHeaders);
     } else {
       setHeaders(tableHeaders);
     }
-  }, [setHeaders]);
+  }, []);
 
   const handleDragStart = (e) => {
     const { column: columnIdx } = e.target.dataset;
@@ -56,35 +94,68 @@ const Table = ({ users, isLoading, loadMoreUsers }) => {
       const droppedColIdx = headers.findIndex(
         (_, i) => Number(columnIdx) === i
       );
-      const draggedColIdx = e.dataTransfer.getData("colIdx");
+      const draggedColIdx = Number(e.dataTransfer.getData("colIdx"));
       const tempCols = [...headers];
 
       tempCols[draggedColIdx] = headers[droppedColIdx];
       tempCols[droppedColIdx] = headers[draggedColIdx];
+
+      const storedHeaders = getFromLocalStorage("headers");
+
+      const headersOrderHasChanged = !storedHeaders
+        ? hasHeadersChanged(tempCols, tableHeaders)
+        : hasHeadersChanged(tempCols, storedHeaders);
+
+      if (headersOrderHasChanged) {
+        setConfirmPopup(true);
+      }
 
       setHeaders(tempCols);
       setDragOver(null);
     }
   };
 
+  const handleSort = (column) => {
+    if (!column.sortable) return;
+
+    let direction = "asc";
+    if (sortColumn === column.sortKey && sortDirection === "asc") {
+      direction = "desc";
+    }
+
+    setSortColumn(column.sortKey);
+    setSortDirection(direction);
+
+    const sortedUsers = [...users].sort((a, b) => {
+      const valueA = a[column.sortKey];
+      const valueB = b[column.sortKey];
+
+      if (
+        column.sortKey === "registeredDate" ||
+        column.sortKey === "dateSinceRegistered"
+      ) {
+        const dateA = new Date(valueA);
+        const dateB = new Date(valueB);
+
+        return compareValues(dateA, dateB, "date", direction);
+      } else if (typeof valueA === "string" && typeof valueB === "string") {
+        return compareValues(valueA, valueB, "string", direction);
+      } else {
+        return compareValues(valueA, valueB, typeof valueA, direction);
+      }
+    });
+
+    setUsers(sortedUsers);
+  };
+
   return (
     <div className="overflow-x-auto max-h-screen">
-      <div className="flex flex-col align-center justify-content-center dark:bg-gray-800 px-4 py-4 items-center">
-        <span className="text-gray-300">
-          Do you want to save new table order?
-        </span>
-        <div className="flex mt-3">
-          <button
-            onClick={() => saveToLocalStorage("headers", headers)}
-            className="text-white mr-3 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-2 rounded uppercase"
-          >
-            Yes
-          </button>
-          <button className="text-white bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-2 rounded uppercase">
-            No
-          </button>
-        </div>
-      </div>
+      <SaveTableOrderPopup
+        headers={headers}
+        show={confirmPopup}
+        close={() => setConfirmPopup(false)}
+      />
+      <Loader isLoading={isLoading} />
       <table className="w-full text-sm text-left text-gray-300 dark:text-gray-400">
         <TableHeader
           headers={headers}
@@ -93,10 +164,14 @@ const Table = ({ users, isLoading, loadMoreUsers }) => {
           onDrop={handleOnDrop}
           onDragEnter={handleDragEnter}
           dragOver={dragOver}
+          onSort={handleSort}
+          sortColumn={sortColumn}
+          sortDirection={sortDirection}
         />
+
         <TableBody users={users} dragOver={dragOver} headers={headers} />
       </table>
-      <Loader isLoading={isLoading} loadMoreCallback={loadMoreUsers} />
+      {!isLoading ? <div ref={loadMoreUsers}></div> : null}
     </div>
   );
 };

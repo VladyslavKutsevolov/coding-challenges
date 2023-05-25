@@ -15,7 +15,7 @@ const generateFakeData = (count) => {
     email: faker.internet.email(),
     city: faker.address.city(),
     registeredDate: JSON.parse(JSON.stringify(faker.date.past())).split("T")[0],
-    fullName: faker.name.firstName() + faker.name.lastName(),
+    fullName: `${faker.name.firstName()} ${faker.name.lastName()}`,
     dateSinceRegistered: calculateDaysSinceRegistered(
       JSON.parse(JSON.stringify(faker.date.past()))
     ),
