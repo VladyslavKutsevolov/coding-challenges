@@ -139,7 +139,6 @@ const Table = ({ users, isLoading, loadMoreUsers, setUsers, currentUser }) => {
       } else if (column.sortKey === "dateSinceRegistered") {
         const splitedValueA = Number(valueA.split(" ")[0]);
         const splitedValueB = Number(valueB.split(" ")[0]);
-
         return compareValues(splitedValueA, splitedValueB, "number", direction);
       } else if (typeof valueA === "string" && typeof valueB === "string") {
         return compareValues(valueA, valueB, "string", direction);
