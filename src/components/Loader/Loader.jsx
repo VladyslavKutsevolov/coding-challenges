@@ -1,10 +1,20 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 const Loader = ({ isLoading }) => {
-  if (isLoading)
+  if (isLoading) {
+    console.log("here");
     return (
-      <div className="loader text-center text-white">Loading users...</div>
+      <div className="loader text-center text-white sticky">
+        Loading users...
+      </div>
     );
+  }
+};
+
+Loader.propTypes = {
+  /** trigger loader default: false */
+  isLoading: PropTypes.bool.isRequired,
 };
 
 export default Loader;

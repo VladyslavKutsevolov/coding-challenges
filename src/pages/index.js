@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { Table } from "@/components/Table";
-import { generateFakeData } from "@/utils/helpers";
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import { useUser } from "@auth0/nextjs-auth0/client";
 
 export async function getServerSideProps() {
-  const usersData = generateFakeData(100);
+  const fetchUsers = await fetch("http://localhost:3000/api/user/getUsers", {
+    method: "GET",
+  });
+
+  const usersData = await fetchUsers.json();
 
   return {
     props: {
@@ -15,15 +18,15 @@ export async function getServerSideProps() {
 }
 
 export default function Home({ usersData }) {
-  const { user: currentUser, error, isLoading: userLoading } = useUser();
-
-  if (userLoading) return <div>Loading...</div>;
-  if (error) return <div>{error.message}</div>;
-
   const [users, setUsers] = useState(usersData);
 
   const { dynamicUsers, hasDynamicUsers, isLoading, loadMoreUsers } =
     useInfiniteScroll(users, setUsers);
+
+  const { user: currentUser, error, isLoading: userLoading } = useUser();
+
+  if (userLoading) return <div>Loading...</div>;
+  if (error) return <div>{error.message}</div>;
 
   const renderAuth = () => {
     if (!currentUser) {

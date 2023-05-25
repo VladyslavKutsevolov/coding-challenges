@@ -3,6 +3,7 @@ import Loader from "@/components/Loader/Loader";
 import { TableBody, TableHeader } from "@/components/Table";
 import { getFromLocalStorage } from "@/utils/helpers";
 import SaveTableOrderPopup from "@/components/Table/SaveTableOrderPopup";
+import PropTypes from "prop-types";
 
 const tableHeaders = [
   {
@@ -27,7 +28,7 @@ const tableHeaders = [
     name: "Date since registered",
     sortable: true,
     draggable: true,
-    sortKey: "dsr",
+    sortKey: "dateSinceRegistered",
   },
 ];
 
@@ -130,14 +131,16 @@ const Table = ({ users, isLoading, loadMoreUsers, setUsers, currentUser }) => {
       const valueA = a[column.sortKey];
       const valueB = b[column.sortKey];
 
-      if (
-        column.sortKey === "registeredDate" ||
-        column.sortKey === "dateSinceRegistered"
-      ) {
+      if (column.sortKey === "registeredDate") {
         const dateA = new Date(valueA);
         const dateB = new Date(valueB);
 
         return compareValues(dateA, dateB, "date", direction);
+      } else if (column.sortKey === "dateSinceRegistered") {
+        const splitedValueA = Number(valueA.split(" ")[0]);
+        const splitedValueB = Number(valueB.split(" ")[0]);
+
+        return compareValues(splitedValueA, splitedValueB, "number", direction);
       } else if (typeof valueA === "string" && typeof valueB === "string") {
         return compareValues(valueA, valueB, "string", direction);
       } else {
@@ -150,6 +153,7 @@ const Table = ({ users, isLoading, loadMoreUsers, setUsers, currentUser }) => {
 
   return (
     <div className="overflow-x-auto max-h-screen">
+      <Loader isLoading={isLoading} />
       {currentUser && (
         <SaveTableOrderPopup
           headers={headers}
@@ -157,7 +161,6 @@ const Table = ({ users, isLoading, loadMoreUsers, setUsers, currentUser }) => {
           close={() => setConfirmPopup(false)}
         />
       )}
-      <Loader isLoading={isLoading} />
       <table className="w-full text-sm text-left text-gray-300 dark:text-gray-400">
         <TableHeader
           headers={headers}
@@ -176,6 +179,23 @@ const Table = ({ users, isLoading, loadMoreUsers, setUsers, currentUser }) => {
       {!isLoading ? <div ref={loadMoreUsers}></div> : null}
     </div>
   );
+};
+
+Table.propTypes = {
+  /** users data */
+  users: PropTypes.array.isRequired,
+
+  /** fetching user data */
+  isLoading: PropTypes.bool.isRequired,
+
+  /** trigger next batch of users to be loaded */
+  loadMoreUsers: PropTypes.func.isRequired,
+
+  /** saving users to state */
+  setUsers: PropTypes.func.isRequired,
+
+  /** auth0 user */
+  currentUser: PropTypes.shape({}),
 };
 
 export default Table;

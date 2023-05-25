@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { saveToLocalStorage } from "@/utils/helpers";
+import PropTypes from "prop-types";
 
 const SaveTableOrderPopup = ({ headers, show, close }) => {
   const [showPopup, setShowPopup] = useState(show);
@@ -13,7 +14,7 @@ const SaveTableOrderPopup = ({ headers, show, close }) => {
   }
 
   return (
-    <div className="confirm-popup absolute bottom-4 right-4 flex flex-col align-center justify-content-center dark:bg-gray-800 px-4 py-4 items-center">
+    <div className="absolute bottom-4 right-4 flex flex-col align-center justify-content-center bg-gray-50 dark:bg-gray-700 dark:text-gray-400 rounded px-4 py-4 items-center">
       <span className="text-gray-300">
         Do you want to save new table order?
       </span>
@@ -36,6 +37,17 @@ const SaveTableOrderPopup = ({ headers, show, close }) => {
       </div>
     </div>
   );
+};
+
+SaveTableOrderPopup.propTypes = {
+  /** Table headers */
+  headers: PropTypes.array.isRequired,
+
+  /** trigger display popup default: false */
+  show: PropTypes.bool.isRequired,
+
+  /** close popup */
+  close: PropTypes.func.isRequired,
 };
 
 export default SaveTableOrderPopup;

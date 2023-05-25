@@ -1,5 +1,6 @@
 import React from "react";
 import { toCamelCase } from "@/utils/helpers";
+import PropTypes from "prop-types";
 
 const TableBody = ({ users, headers }) => {
   if (!users.length) {
@@ -33,6 +34,15 @@ const TableBody = ({ users, headers }) => {
       ))}
     </tbody>
   );
+};
+
+TableBody.propTypes = {
+  /** list of users data*/
+  users: PropTypes.array.isRequired,
+
+  /** table headers */
+  headers: PropTypes.arrayOf(PropTypes.shape({ name: PropTypes.string }))
+    .isRequired,
 };
 
 export default TableBody;

@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 const TableHeader = ({
   headers,
@@ -68,6 +69,35 @@ const TableHeader = ({
       </tr>
     </thead>
   );
+};
+
+TableHeader.propTypes = {
+  /** table headers */
+  headers: PropTypes.array.isRequired,
+
+  /** detect when column dragged */
+  onDragStart: PropTypes.func.isRequired,
+
+  /** index of dragged column */
+  dragOver: PropTypes.number,
+
+  /** saving dragged index */
+  onDragEnter: PropTypes.func.isRequired,
+
+  /** restore */
+  onDragOver: PropTypes.func.isRequired,
+
+  /** swap columns */
+  onDrop: PropTypes.func.isRequired,
+
+  /** sort table column */
+  onSort: PropTypes.func.isRequired,
+
+  /** column to be sorted */
+  sortColumn: PropTypes.string,
+
+  /** sort direction */
+  sortDirection: PropTypes.string.isRequired,
 };
 
 export default TableHeader;
