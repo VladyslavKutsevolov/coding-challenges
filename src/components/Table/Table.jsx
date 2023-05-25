@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Loader from "@/components/Loader/Loader";
 import { TableBody, TableHeader } from "@/components/Table";
-import { getFromLocalStorage, saveToLocalStorage } from "@/utils/helpers";
+import { getFromLocalStorage } from "@/utils/helpers";
 import SaveTableOrderPopup from "@/components/Table/SaveTableOrderPopup";
 
 const tableHeaders = [
@@ -35,7 +35,7 @@ const hasHeadersChanged = (actual, stored) =>
   stored?.length && JSON.stringify(stored) !== JSON.stringify(actual);
 
 const compareValues = (value1, value2, dataType, direction) => {
-  let result = 0;
+  let result;
 
   switch (dataType) {
     case "number":
@@ -54,7 +54,7 @@ const compareValues = (value1, value2, dataType, direction) => {
   return direction === "asc" ? result : -result;
 };
 
-const Table = ({ users, isLoading, loadMoreUsers, setUsers }) => {
+const Table = ({ users, isLoading, loadMoreUsers, setUsers, currentUser }) => {
   const [headers, setHeaders] = useState(tableHeaders);
   const [dragOver, setDragOver] = useState(null);
   const [confirmPopup, setConfirmPopup] = useState(false);
@@ -150,11 +150,13 @@ const Table = ({ users, isLoading, loadMoreUsers, setUsers }) => {
 
   return (
     <div className="overflow-x-auto max-h-screen">
-      <SaveTableOrderPopup
-        headers={headers}
-        show={confirmPopup}
-        close={() => setConfirmPopup(false)}
-      />
+      {currentUser && (
+        <SaveTableOrderPopup
+          headers={headers}
+          show={confirmPopup}
+          close={() => setConfirmPopup(false)}
+        />
+      )}
       <Loader isLoading={isLoading} />
       <table className="w-full text-sm text-left text-gray-300 dark:text-gray-400">
         <TableHeader
