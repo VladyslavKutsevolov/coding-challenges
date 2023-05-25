@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Table } from "@/components/Table";
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import Link from "next/link";
 
 export async function getServerSideProps() {
   const fetchUsers = await fetch("http://localhost:3000/api/user/getUsers", {
@@ -31,22 +32,22 @@ export default function Home({ usersData }) {
   const renderAuth = () => {
     if (!currentUser) {
       return (
-        <a
+        <Link
           href="/api/auth/login"
           className="border border-white text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-800"
         >
           Log in
-        </a>
+        </Link>
       );
     }
 
     return (
-      <a
+      <Link
         href="/api/auth/logout"
         className="border border-white text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-800"
       >
         Log out
-      </a>
+      </Link>
     );
   };
 
