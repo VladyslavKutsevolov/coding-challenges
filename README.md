@@ -1,6 +1,13 @@
 ## Getting Started
 
-First, run the development server:
+Set environment variables:
+
+```bash
+cp .env.example .env.local
+```
+
+
+Run the development server:
 
 ```bash
 npm run dev
