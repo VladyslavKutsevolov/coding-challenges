@@ -21,7 +21,7 @@ export async function getServerSideProps() {
 export default function Home({ usersData }) {
   const [users, setUsers] = useState(usersData);
 
-  const { dynamicUsers, hasDynamicUsers, isLoading, loadMoreUsers } =
+  const { isLoading, loadMoreUsers } =
     useInfiniteScroll(users, setUsers);
 
   const { user: currentUser, error, isLoading: userLoading } = useUser();
@@ -61,7 +61,7 @@ export default function Home({ usersData }) {
         </nav>
       </header>
       <Table
-        users={hasDynamicUsers ? dynamicUsers : users}
+        users={users}
         isLoading={isLoading}
         loadMoreUsers={loadMoreUsers}
         setUsers={setUsers}

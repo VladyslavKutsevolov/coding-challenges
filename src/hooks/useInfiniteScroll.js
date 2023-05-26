@@ -3,8 +3,6 @@ import { generateFakeData } from "@/utils/helpers";
 
 const UseInfiniteScroll = (users, setUsers) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [hasDynamicUsers, setHasDynamicUsers] = useState(false);
-  const [dynamicUsers, setDynamicUsers] = useState(users);
   const observerRef = useRef();
   const loadMoreTimeout = setTimeout(() => null, 500);
   const loadMoreTimeoutRef = useRef(loadMoreTimeout);
@@ -23,15 +21,13 @@ const UseInfiniteScroll = (users, setUsers) => {
 
           if (fetchedUsers.length) {
             const newUsers = [...users, ...fetchedUsers];
-            setDynamicUsers(newUsers);
             setUsers(newUsers);
-            setHasDynamicUsers(true);
             setIsLoading(false);
           }
         }, 500);
       }
     },
-    [loadMoreTimeoutRef, setIsLoading, dynamicUsers]
+    [loadMoreTimeoutRef, setIsLoading, setUsers, users]
   );
 
   const loadMoreUsers = useCallback(
@@ -56,8 +52,6 @@ const UseInfiniteScroll = (users, setUsers) => {
   return {
     isLoading,
     loadMoreUsers,
-    hasDynamicUsers,
-    dynamicUsers,
   };
 };
 
