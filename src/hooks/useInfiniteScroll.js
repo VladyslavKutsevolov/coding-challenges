@@ -1,5 +1,4 @@
 import React, { useCallback, useRef, useState } from "react";
-import { generateFakeData } from "@/utils/helpers";
 
 const UseInfiniteScroll = (users, setUsers) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -16,8 +15,12 @@ const UseInfiniteScroll = (users, setUsers) => {
 
         clearTimeout(loadMoreTimeoutRef.current);
 
-        loadMoreTimeoutRef.current = setTimeout(() => {
-          const fetchedUsers = generateFakeData(100);
+        loadMoreTimeoutRef.current = setTimeout(async () => {
+          const getUsers = await fetch("http://localhost:3000/api/user/getUsers", {
+              method: "GET",
+          });
+
+          const fetchedUsers = await getUsers.json();
 
           if (fetchedUsers.length) {
             const newUsers = [...users, ...fetchedUsers];
