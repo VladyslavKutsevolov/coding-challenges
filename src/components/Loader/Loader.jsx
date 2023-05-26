@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 
 const Loader = ({ isLoading }) => {
   if (isLoading) {
-    console.log("here");
     return (
       <div className="loader text-center text-white sticky">
         Loading users...
