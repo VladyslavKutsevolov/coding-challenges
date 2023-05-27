@@ -4,6 +4,7 @@ import { TableBody, TableHeader } from "@/components/Table";
 import { getFromLocalStorage } from "@/utils/helpers";
 import SaveTableOrderPopup from "@/components/Table/SaveTableOrderPopup";
 import PropTypes from "prop-types";
+import { FaArrowUp } from "react-icons/fa";
 
 const tableHeaders = [
   {
@@ -61,6 +62,7 @@ const Table = ({ users, isLoading, loadMoreUsers, setUsers, currentUser }) => {
   const [confirmPopup, setConfirmPopup] = useState(false);
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
+  const [showScrollToTop, setShowScrollToTop] = useState(false);
 
   useEffect(() => {
     const storedHeaders = getFromLocalStorage("headers");
@@ -73,6 +75,24 @@ const Table = ({ users, isLoading, loadMoreUsers, setUsers, currentUser }) => {
       setHeaders(tableHeaders);
     }
   }, []);
+
+  const handleScroll = () => {
+    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    setShowScrollToTop(scrollTop > 0);
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  const handleScrollToTop = () => {
+    const tableContainer = document.getElementById("table-container");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    tableContainer.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const handleDragStart = (e) => {
     const { column: columnIdx } = e.target.dataset;
@@ -151,7 +171,7 @@ const Table = ({ users, isLoading, loadMoreUsers, setUsers, currentUser }) => {
   };
 
   return (
-    <div className="overflow-x-auto max-h-screen">
+    <div id="table-container" className="overflow-x-auto max-h-screen">
       <Loader isLoading={isLoading} />
       {currentUser && (
         <SaveTableOrderPopup
@@ -175,6 +195,14 @@ const Table = ({ users, isLoading, loadMoreUsers, setUsers, currentUser }) => {
 
         <TableBody users={users} dragOver={dragOver} headers={headers} />
       </table>
+      {showScrollToTop && (
+          <button
+              className="fixed bottom-4 right-4 bg-gray-400 text-white rounded-full p-2 shadow-lg cursor-pointer"
+              onClick={handleScrollToTop}
+          >
+            <FaArrowUp />
+          </button>
+      )}
       {!isLoading ? <div ref={loadMoreUsers}></div> : null}
     </div>
   );
