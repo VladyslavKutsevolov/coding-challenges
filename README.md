@@ -1,5 +1,7 @@
 ## Getting Started
 
+[Live version](https://isleofcode-puzzle.vercel.app/)
+
 Set environment variables:
 
 ```bash
