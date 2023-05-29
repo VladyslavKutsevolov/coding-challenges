@@ -5,7 +5,7 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 import Link from "next/link";
 
 export async function getServerSideProps() {
-  const fetchUsers = await fetch("http://127.0.0.1:3000/api/user/getUsers", {
+  const fetchUsers = await fetch(`${process.env.BASE_URL}/api/user/getUsers`, {
     method: "GET",
   });
 
